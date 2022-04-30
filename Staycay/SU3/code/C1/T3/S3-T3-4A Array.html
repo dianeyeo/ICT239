@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+</head>
+<body>
+<script>
+    /* array: constructed of square brackets; items separated by commas */
+    let grocery = ['egg','bread','milk'];
+    let id = [5,10,12];
+    /* item types can also be mixed and matched */
+    let grocery_list = [[5,'egg'],[10,'bread'],[12,'milk']];
+
+    /* accessing and modifying array items */
+    alert(grocery[1]); // returns 'bread', the 2nd item
+    alert(grocery_list[2][1]); // returns 'milk', 2nd item of 3rd array
+
+    /* array modified with a new value */
+    id[0] = 99;
+    alert(id); //return [99,10,12]
+
+    /* length of array: grocery = ['egg','bread','milk'] */
+    alert(grocery.length); //returns 3
+</script>
+</body>
+</html>

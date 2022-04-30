@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function test(){
+        /* set within this function, the scope confined to within the function */
+        let local = 999;
+        console.log('local '+local);
+        console.log('global '+global);
+    }
+    /* outside the function, considered as under the global scope */
+    let global = '888';
+    test();
+    console.log('main'+local);
+</script>
+</body>
+</html>

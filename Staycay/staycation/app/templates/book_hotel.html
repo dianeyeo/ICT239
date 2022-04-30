@@ -1,0 +1,37 @@
+<!-- individual hotel cards, each hotel's date picker for booking -->
+{% extends "base.html" %}
+{% block hotels %}
+
+
+<!-- selected hotel card with image & description -->
+<div class="card card-common col-4 p-0 mr-1">
+    <!-- access individual hotel package -->
+    {% for hotel in hotels %}
+    <!-- return hotel package that matches the hotel name in panel -->
+    {% if panel == hotel.hotel_name %}
+    <img class="card-img-top" src="{{ hotel.image_url }}" alt="Hotel Image">
+    <div class="card-body">
+        <h5 class="card-title">{{ hotel.hotel_name }}</h5>
+        <p class="card-text">{{ hotel.description }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- date picker -->
+<div class="card card-common col-6 p-0 h-100">
+    <div class="card-header">
+        <h3>Select This Offer</h3>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Check_in_date</h5>
+        <!-- datepicker -->
+        <div class="md-form md-outline input-with-post-icon datepicker mb-3" inline="true">
+            <input type="date" class="form-control" />
+        </div>
+        <a href="#" class="btn btn-primary">Submit</a>
+    </div>
+</div>
+
+
+{% endblock %}

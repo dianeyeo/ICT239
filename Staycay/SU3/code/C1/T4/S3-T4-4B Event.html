@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+</head>
+<body><button>button</button></body>
+</html>
+<!-- javascript to respond to user’s interaction with the button -->
+<script type='text/javascript'>
+    /* defined the variable btn to the <button> element */
+    const btn = document.querySelector('button');
+
+    function random(number) {
+        /* Math.random(): generate a random decimal number between 0 and 1 */
+        return Math.floor(Math.random()*(number+1));
+    }
+    /* bgChange(): generates a random set of RGB colours */
+    function bgChange() {
+        const rndCol = 'rgb(' + random(255) + ',' + random(255) + ',' + random(255) + ')';
+        /* set the background color of the entire browser */
+        document.body.style.backgroundColor = rndCol;
+    }
+    /* btn.onclick: can be registered on nearly any element */
+    /* btn.ondblclick: the button is double clicked. */
+    /* btn.onmouseover: the mouse pointer moves inside the element */
+    /* window.onkeypress: a key is pressed on the keyboard; doesn't apply to button */
+    btn.onclick = bgChange;
+</script>

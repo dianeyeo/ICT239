@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+    <!-- download the jQuery file to the same folder -->
+    <script src='jquery-3.3.1.min.js'></script>
+</head>
+<body>
+<input id='test_input'>
+</body>
+<script >
+    $(document).ready(function(){
+        let text = $('#test_input').val()
+        alert(text); //we are selecting based on id
+        $('#test_input').val('New value'); //set a value for the input box
+        text = $('#test_input').val()
+        alert(text); //we are selecting based on id
+    });
+</script>
+</html>

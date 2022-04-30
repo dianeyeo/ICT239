@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+    <!-- download the jQuery file to the same folder -->
+    <script src='jquery-3.3.1.min.js'></script>
+</head>
+<body>
+<p>Paragraph 1</p>
+<p>Paragraph 2</p>
+</body>
+<script >
+    /* on() method with click = $('p').click(function() */
+    $('p').on('click', function(){
+        alert('I am clicked');
+    });
+
+    /* on(): handle multiple events for the same element */
+    $('p').on('click mouseenter', function(){
+        alert('I am disturbed');
+    });
+</script>
+</html>

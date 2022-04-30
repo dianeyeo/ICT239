@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang='en'><head>
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head><style>
+    .chart div{
+        /* background color */
+        background-color: blue;
+        /* word color */
+        color: white;
+    }
+</style>
+<div class='chart'></div>
+<script type='text/javascript'>
+    const data = [4, 8, 15, 16, 23, 42];
+    d3.select('.chart') //select chart container includes class=chart
+        .selectAll('div') //select all div element to exist in the chart container
+        .data(data) //join the data to the selection
+        .enter().append('div') //create new div elements, append them to the enter selection
+        .style('width', function(d){return d*10+'px';}) //set width of each new bar as multiple of the associated data value d
+        .text(function(d){return d;}) //using same value, set it as the text content of each bar
+</script></html>

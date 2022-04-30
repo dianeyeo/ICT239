@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head>
+<body></body>
+<script type='text/javascript'>
+    const data = [[10, 15], [20, 20], [5, 20], [7 ,4], [22, 6]];
+
+    <!-- select the <body> tag of the HTML document, append a SVG element -->
+    const svg = d3.select('body')
+        .append('svg')
+        .attr('width', 300)
+        .attr('height', 300);
+
+    svg.selectAll('circle')
+        .data(data)
+        .enter().append('circle')
+        .attr('cx', function(d){return 10*d[0]})
+        .attr('cy', function(d){return 10*d[1]})
+        .attr('r', 5);
+</script>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+    <!-- download the jQuery file to the same folder -->
+    <script src='jquery-3.3.1.min.js'></script>
+</head>
+<body>
+<p id='p1'>Paragraph 1 hide then fadeIn()</p>
+<p id='p2'>Paragraph 2 fadeOut()</p>
+<p id='p3'>Paragraph 3 fadeTo()</p>
+<p id='p4'>Paragraph 4 slideUp()</p>
+</body>
+<script >
+    /* fade in all <p> elements slowly */
+    $('#p1').hide()
+    $('#p1').fadeIn(5000)
+    $('#p2').fadeOut(5000)
+    /* fade #p3 to 0.5 opacity in 5000 milliseconds */
+    $('#p3').fadeTo(5000, 0.5)
+    $('#p4').slideUp(5000)
+</script>
+</html>

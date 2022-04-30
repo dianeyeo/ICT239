@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+</head>
+<body>
+<script>
+    let condition = 'A';
+    if(condition === 'A')
+        alert('Condition A');
+    else
+        alert('NOT Condition A');
+
+    condition = 'B';
+    if(condition === 'A')
+        alert('Condition A');
+    else if(condition === 'B')
+        alert('Condition B');
+    else
+        alert('ELSE');
+
+    condition = 'C';
+    if(condition === 'A')
+        alert('Condition A');
+    else{
+        if(condition === 'C')
+            alert('Condition C');
+        else
+            alert('ELSE');
+    }
+</script>
+</body>
+</html>
