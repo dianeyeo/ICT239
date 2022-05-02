@@ -36,15 +36,6 @@ def show_base():
     return render_template('base.html')
 
 
-# # render product page - reads from csv file
-# @app.route('/products', methods=['GET', 'POST'])
-# def products():
-#     if request.method == 'GET':
-#         # read staycation.csv file, from book_packages.py
-#         return render_template('products.html', name=current_user.name, panel='Package')
-
-
-# render product page - reads from db(monogodb)
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     if request.method == 'GET':

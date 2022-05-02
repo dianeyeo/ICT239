@@ -33,20 +33,20 @@ class pCHART(db.Document):
         firstDate = datetime(2022, 1, 7)
         lastDate = datetime(2022, 3, 2)
 
-        # for d in data:
+        for d in data:
 
-        #     pDate = d['check_in_date']
+            pDate = d['check_in_date']
 
-        #     if pDate <= firstDate:
-        #         firstDate = pDate
+            if pDate <= firstDate:
+                firstDate = pDate
 
-        #     if pDate >= lastDate:
-        #         lastDate = pDate
+            if pDate >= lastDate:
+                lastDate = pDate
 
-        #     if readings.get(d['User']):
-        #         readings[d['User']].append([d['check_in_date'], d['Income']])
-        #     else:
-        #         readings[d['User']] = [[d['check_in_date'], d['Income']]]
+            if readings.get(d['User']):
+                readings[d['User']].append([d['check_in_date'], d['Income']])
+            else:
+                readings[d['User']] = [[d['check_in_date'], d['Income']]]
 
         self.update(__raw__={'$set': {'readings': readings,
                     'firstDate': firstDate, 'lastDate': lastDate}})
@@ -91,6 +91,66 @@ class pCHART(db.Document):
         return chartData, chartLabels
 
 
+def calculate_hotelIncome():
+    hotel_totalIncome = {}
+
+    booking_records = Bookings.objects()
+    stay_records = Staycation.objects()
+
+    for book in booking_records:
+        hotel_name = book['hotel_name']
+        # store check_in_date in yyyy-mm-dd format
+        check_in_date = book['check_in_date'].strftime('%Y-%m-%d')
+        # retrieve duration from staycation
+        duration = stay_records.filter(
+            hotel_name=hotel_name).first()['duration']
+        # retrieve unit_cost from staycation
+        unit_cost = stay_records.filter(
+            hotel_name=hotel_name).first()['unit_cost']
+        total_income = duration * unit_cost
+
+        # if hotel name doesn't exist in hotel_totalIncome
+        if hotel_name not in hotel_totalIncome:
+            hotel_totalIncome[hotel_name] = {check_in_date: total_income}
+        # if check_in_date exists >1 in hotel_totalIncome
+        elif check_in_date in hotel_totalIncome[hotel_name]:
+            hotel_totalIncome[hotel_name][check_in_date] += total_income
+        # if check_in_date doesn't exist in hotel_totalIncome
+        else:
+            hotel_totalIncome[hotel_name][check_in_date] = total_income
+
+    return hotel_totalIncome
+
+
+def chartDim(hotel_totalIncome, chartXLabels):
+    hotelDim = hotel_totalIncome
+
+    # for hotel in sortedHotelIncome:
+    #     sortedHotelIncome[hotel] = {key: sortedHotelIncome[hotel][key]
+    #                                 for key in sorted(sortedHotelIncome[hotel].keys())}
+    #     sortedHotelIncome[hotel] = list(sortedHotelIncome[hotel].values())
+
+    hotelDim = {}
+    # access hotel names
+    for hotel in hotel_totalIncome.keys():
+        # give each value in range a deafult value of -1
+        hotelDim[hotel] = [-1] * len(chartXLabels)
+
+        # if date in chartXlabels not in hotel_totalIncome
+        for date in hotel_totalIncome[hotel].keys():
+            # identify index of date in chartXlabels, replace deafult value (-1) with total income
+            hotelDim[hotel][chartXLabels.index(
+                date)] = hotel_totalIncome[hotel][date]
+
+    return hotelDim
+
+
+def chartXLabels():
+    booking_dates = Bookings.objects().distinct('check_in_date')
+    booking_dates = [i.strftime('%Y-%m-%d') for i in booking_dates]
+    return booking_dates
+
+
 @dashboard.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def render_dashboard():
@@ -99,52 +159,8 @@ def render_dashboard():
 
     elif request.method == 'POST':
 
-        listOfPackage = []
+        hotelTotalIncome = calculate_hotelIncome()
+        chartLabels = chartXLabels()
+        chartData = chartDim(hotelTotalIncome, chartLabels)
 
-        # TODO: dynamically get dates from file
-        # don't hardcode the dates
-        firstDate = datetime(2022, 1, 7)
-        lastDate = datetime(2022, 3, 2)
-
-        # delete all data from db
-        # pCHART.objects(firstDate=firstDate, lastDate=lastDate).delete()
-
-        # sort (inplace) check_in_date to get min & max for x-axis
-        # check_in_date = Bookings.objects['check_in_date']
-        # check_in_date.sort(key=lambda x: x.split('-')[0])
-
-        # get data (check_in_date & hotel_name) from bookings.csv
-        booking_records = Bookings.objects.all()
-
-        # check_in_date, hotel_name
-        check_in_date = request.args.get('check_in_date')
-        hotel_name = request.args.get('hotel_name')
-
-        for book in booking_records:
-            check_in_date = book.check_in_date
-            hotel_name = book.hotel_name
-            # append selected data to list
-            listOfPackage.append(
-                {'check_in_date': check_in_date, 'hotel_name': hotel_name})
-
-        # blank chart
-        newChart = pCHART(firstDate=None, lastDate=None, readings=None).save()
-        # populate blank chart with data from list
-        newChart.insert_reading_data_into_database(listOfPackage)
-
-        # # get objects from db
-        pChartObjects = pCHART.objects(firstDate=firstDate, lastDate=lastDate)
-
-        if len(pChartObjects) >= 1:
-            readings = {}
-
-            readings = pChartObjects[0]['readings']
-            firstDate = pChartObjects[0]['firstDate']
-            lastDate = pChartObjects[0]['lastDate']
-
-            # get data
-            chartData = {}
-            chartLabels = []
-            chartData, chartLabels = pChartObjects[0].prepare_chart_dimension_and_label(
-            )
-            return jsonify({'chartData': chartData, 'chartLabels': chartLabels})
+        return jsonify({'chartData': chartData, 'chartLabels': chartLabels})

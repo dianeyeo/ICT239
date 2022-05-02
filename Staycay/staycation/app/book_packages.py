@@ -15,6 +15,7 @@ product = Blueprint('product', __name__)
 #     with open('assets/js/staycation.csv', 'r') as file:
 #         reader = csv.DictReader(file, delimiter=',', quotechar='"')
 #         packages = list(reader)
+#         # print(packages)
 #         return render_template('products.html', name=current_user.name, panel="Package", products=packages)
 
 

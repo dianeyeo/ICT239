@@ -4,9 +4,12 @@ from flask import Blueprint, request, redirect, render_template, url_for, flash
 from forms import RegForm
 from users import User
 
+import csv
+
 auth = Blueprint('auth', __name__)
 
 
+# register using db (mongodb)
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegForm()
@@ -28,6 +31,7 @@ def register():
     return render_template('register.html', form=form, panel="Register")
 
 
+# login using db (mongodb)
 @auth.route('/login', methods=['GET', 'POST'])
 @auth.route('/')
 def login():
