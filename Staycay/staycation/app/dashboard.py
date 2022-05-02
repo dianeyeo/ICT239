@@ -6,17 +6,18 @@ from app import db
 import csv
 import io
 
-from bmi import BMIDAILY
-from users import User
+from staycation import Staycation
+from bookings import Bookings
+
 
 dashboard = Blueprint('dashboard', __name__)
 
 
-class CHART(db.Document):
-
+class pCHART(db.Document):
+    # store data in mongodb
     meta = {'collection': 'chart'}
-    fdate = db.DateTimeField()
-    ldate = db.DateTimeField()
+    firstDate = db.DateTimeField()
+    lastDate = db.DateTimeField()
     readings = db.DictField()
 
     def get_dict_from_csv(self, file):
@@ -27,167 +28,123 @@ class CHART(db.Document):
         return(list(dict_reader))
 
     def insert_reading_data_into_database(self, data):
-
         readings = {}
-        # fDate = datetime(3000, 1, 1)
-        # lDate = datetime(2000, 12, 31)
-        fDate = datetime(3000, 1, 1)
-        lDate = datetime(2000, 12, 31)
 
-        for item in data:
-            # parts = [int(x) for x in item['Date'].split('-')]
-            # myDate = datetime(parts[0], parts[1], parts[2])
-            myDate = item['Date']
+        firstDate = datetime(2022, 1, 7)
+        lastDate = datetime(2022, 3, 2)
 
-            if myDate <= fDate:
-                fDate = myDate
+        # for d in data:
 
-            if myDate >= lDate:
-                lDate = myDate
+        #     pDate = d['check_in_date']
 
-            # BMI(name=item['User'], date=myDate, bmi=item['BMI']).save()
-            if readings.get(item['User']):
-                readings[item['User']].append([item['Date'], item['BMI']])
-            else:
-                readings[item['User']] = [[item['Date'], item['BMI']]]
+        #     if pDate <= firstDate:
+        #         firstDate = pDate
 
-        # dbd.readings.insert_one({"readings": readings, "fDate": fDate, "lDate": lDate})
-        self.update(
-            __raw__={'$set': {'readings': readings, 'fdate': fDate, 'ldate': lDate}})
+        #     if pDate >= lastDate:
+        #         lastDate = pDate
+
+        #     if readings.get(d['User']):
+        #         readings[d['User']].append([d['check_in_date'], d['Income']])
+        #     else:
+        #         readings[d['User']] = [[d['check_in_date'], d['Income']]]
+
+        self.update(__raw__={'$set': {'readings': readings,
+                    'firstDate': firstDate, 'lastDate': lastDate}})
 
     def prepare_chart_dimension_and_label(self):
+        chartData = {}
+        chartLabels = []
 
-        chartDim = {}
-        labels = []
-
-        start_date = self.fdate
-        end_date = self.ldate
-        delta = timedelta(days=1)
+        start_date = self.firstDate
+        end_date = self.lastDate
+        step = timedelta(days=4)
 
         while start_date <= end_date:
-            month = str(start_date.month)  # months from 1-12
+            # months from 1 to 12
+            month = str(start_date.month)
             day = str(start_date.day)
             year = str(start_date.year)
 
-            aDateString = year + "-" + month + "-" + day
-            labels.append(aDateString)
+            pDateString = year + '-' + month + '-' + day
+            chartLabels.append(pDateString)
 
             for key, values in self.readings.items():
-                if not chartDim.get(key):
-                    chartDim[key] = []
+                if not chartData.get(key):
+                    chartData[key] = []
 
                 filled = False
 
-                for item in values:
-                    # parts=[ int(x) for x in item[0].split('-') ]
-                    # mydate = datetime(parts[0], parts[1], parts[2])
+                for v in values:
+                    pDate = v[0]
 
-                    mydate = item[0]
-
-                    if mydate == start_date:
-                        chartDim[key].append(item[1])
+                    if pDate == start_date:
+                        chartData[key].append(v[1])
                         filled = True
-
                     else:
-                        if mydate > start_date:
+                        if pDate > start_date:
                             if not filled:
-                                chartDim[key].append(-1)
-                            break
+                                chartData[key].append(-1)
+                                break
 
-            start_date += delta
+            start_date += step
 
-        return chartDim, labels
-
-    def get_average(self):
-        aveDict = {}
-        sum = 0
-        count = 0
-        # resCursor = db.readings.find({})
-        readings = self.readings
-
-        for key, values in readings.items():
-            for value in values:
-                sum += float(value[1])
-                count += 1
-
-            aveDict[key] = sum/count
-
-        return aveDict
-
-# it is possible to use pluggable view
+        return chartData, chartLabels
 
 
-@dashboard.route('/chart2', methods=['GET', 'POST'])
-def chart2():
-    if request.method == 'GET':
-        # I want to get some data from the service
-        # do nothing but to show index.html
-        return render_template('bmi_chart2.html', name=current_user.name, panel="BMI Chart")
-    elif request.method == 'POST':
-
-        # To populate the CHART database first using BMIDAILY database
-        listOfDict = []
-
-        fDate = datetime(2021, 1, 17, 0, 0)
-        lDate = datetime(2021, 1, 23, 0, 0)
-        # Chart is indexed by first date and last date
-        # And we are going to plot the pre-set fixed period from 2021-01-17 to 2021-01-23
-        # As DataSet2.csv has this range
-
-        CHART.objects(fdate=fDate, ldate=lDate).delete()
-
-        for item in BMIDAILY.objects():
-            #existing_user = User.objects(email=item['User_email']).first()
-            measure_date = item['date']
-            if fDate <= measure_date <= lDate:
-                bmi = item['averageBMI']
-                listOfDict.append(
-                    {'Date': measure_date, 'User': item.user.name, 'BMI': bmi})
-
-        a_chart = CHART(fdate=None, ldate=None, readings=None).save()
-        a_chart.insert_reading_data_into_database(listOfDict)
-
-        chartobjects = CHART.objects(fdate=fDate, ldate=lDate)
-
-        if len(chartobjects) >= 1:
-
-            readings = {}
-
-            #readings, bDate, lDate = getReadings(listOfDict)
-            readings = chartobjects[0]["readings"]
-            fDate = chartobjects[0]["fdate"]
-            lDate = chartobjects[0]["ldate"]
-
-            chartDim = {}
-            labels = []
-            chartDim, labels = chartobjects[0].prepare_chart_dimension_and_label(
-            )
-            return jsonify({'chartDim': chartDim, 'labels': labels})
-
-
-@dashboard.route('/chart3', methods=['GET', 'POST'])
-def chart3():
-    if request.method == 'GET':
-        # I want to get some data from the service
-        # do nothing but to show index.html
-        return render_template('bmi_chart3.html', name=current_user.name, panel="BMI Chart")
-    elif request.method == 'POST':
-        # Get the values passed from the Front-end, do the BMI calculation, return the BMI back to front-end
-        fDate = datetime(2021, 1, 17, 0, 0)
-        lDate = datetime(2021, 1, 23, 0, 0)
-        chartobjects = CHART.objects(fdate=fDate, ldate=lDate)
-        if len(chartobjects) >= 1:
-            aveDict = chartobjects[0].get_average()
-            return jsonify({'averages': aveDict})
-
-
-@dashboard.route('/dashboard')
+@dashboard.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def render_dashboard():
-    return render_template('dashboard.html', name=current_user.name, panel="Dashboard")
+    if request.method == 'GET':
+        return render_template('dashboard.html', name=current_user.name, panel="Dashboard")
 
+    elif request.method == 'POST':
 
-@dashboard.route('/chart')
-@login_required
-def chart():
-    return render_template('bmi_chart.html', name=current_user.name, panel="BMI Chart")
+        listOfPackage = []
+
+        # TODO: dynamically get dates from file
+        # don't hardcode the dates
+        firstDate = datetime(2022, 1, 7)
+        lastDate = datetime(2022, 3, 2)
+
+        # delete all data from db
+        # pCHART.objects(firstDate=firstDate, lastDate=lastDate).delete()
+
+        # sort (inplace) check_in_date to get min & max for x-axis
+        # check_in_date = Bookings.objects['check_in_date']
+        # check_in_date.sort(key=lambda x: x.split('-')[0])
+
+        # get data (check_in_date & hotel_name) from bookings.csv
+        booking_records = Bookings.objects.all()
+
+        # check_in_date, hotel_name
+        check_in_date = request.args.get('check_in_date')
+        hotel_name = request.args.get('hotel_name')
+
+        for book in booking_records:
+            check_in_date = book.check_in_date
+            hotel_name = book.hotel_name
+            # append selected data to list
+            listOfPackage.append(
+                {'check_in_date': check_in_date, 'hotel_name': hotel_name})
+
+        # blank chart
+        newChart = pCHART(firstDate=None, lastDate=None, readings=None).save()
+        # populate blank chart with data from list
+        newChart.insert_reading_data_into_database(listOfPackage)
+
+        # # get objects from db
+        pChartObjects = pCHART.objects(firstDate=firstDate, lastDate=lastDate)
+
+        if len(pChartObjects) >= 1:
+            readings = {}
+
+            readings = pChartObjects[0]['readings']
+            firstDate = pChartObjects[0]['firstDate']
+            lastDate = pChartObjects[0]['lastDate']
+
+            # get data
+            chartData = {}
+            chartLabels = []
+            chartData, chartLabels = pChartObjects[0].prepare_chart_dimension_and_label(
+            )
+            return jsonify({'chartData': chartData, 'chartLabels': chartLabels})

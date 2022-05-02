@@ -1,7 +1,6 @@
 from flask import request, render_template, Blueprint
 from flask_login import login_required, current_user
 from staycation import Staycation
-from book_packages import product
 
 
 hotel = Blueprint('hotel', __name__)

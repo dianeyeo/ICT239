@@ -2,7 +2,7 @@
 
 import io
 import csv
-from dashboard import CHART
+from dashboard import pCHART
 from users import User
 from staycation import Staycation
 from bookings import Bookings
@@ -12,7 +12,7 @@ from app import app, db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Register Blueprint so we can factor routes
-from dashboard import dashboard, CHART
+from dashboard import dashboard, pCHART
 from auth import auth
 from book_packages import product
 from book_hotel import hotel
