@@ -4,7 +4,9 @@ from flask_wtf import FlaskForm
 # 'StringField' : is the base for most of the fields, usually represents <input type='text'>
 # 'PasswordField' : is a StringField except its input type is <input type='password'>
 # ^ the value that is accepted by the field is not rendered back to the browser like normal fields
-from wtforms import StringField, PasswordField
+# 'DateTimeField' : a text field that stores a datetime.datetime matching format
+# 'FloatField' : a text field, except all input is coerced into a float, inputs with errors are ignored and will not be accepted as a value
+from wtforms import StringField, PasswordField, DateTimeField, FloatField
 # import validators to use on fields to ensure user submits valid data
 from wtforms.validators import Email, Length, InputRequired
 
