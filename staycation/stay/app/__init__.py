@@ -7,11 +7,16 @@ import pymongo
 
 def create_app():
     app = Flask(__name__)
+    # configure settings in MongoDB
     app.config['MONGODB_SETTINGS'] = {
-        'db': 'db_name',
+        # set the name of the MongoDB database
+        # in this case, we set it as 'eca'
+        'db': 'eca',
+        # set the hostname of the MongoDB server
         'host': 'localhost'
     }
     app.static_folder = 'assets'
+    # initialize the MongoDB database
     db = MongoEngine(app)
 
     app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'

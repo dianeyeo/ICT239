@@ -7,7 +7,7 @@ import csv
 import io
 
 from staycation import Staycation
-from bookings import Bookings
+from book import Bookings
 
 
 dashboard = Blueprint('dashboard', __name__)

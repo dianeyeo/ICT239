@@ -5,7 +5,7 @@ import csv
 # from dashboard import pCHART
 from users import User
 from staycation import Staycation
-from bookings import Bookings
+from book import Bookings
 from flask_login import login_required, current_user
 from flask import render_template, request
 from app import app, db, login_manager
