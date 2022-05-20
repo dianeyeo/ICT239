@@ -16,6 +16,7 @@ from dashboard import dashboard
 from auth import auth
 from book_packages import product
 from book_hotel import hotel
+import users
 
 # register blueprint from respective module
 app.register_blueprint(dashboard)
@@ -70,6 +71,6 @@ def upload():
                     unit_cost=item['unit_cost'], image_url=item['image_url'], description=item['description']).save()
             else:
                 book = Bookings(
-                    check_in_date=item['check_in_date'], customer=item['customer'], hotel_name=item['hotel_name']).save()
+                    check_in_date=item['check_in_date'], customer=User, package=Staycation, total_cost=Bookings.calculate_total_cost(item)).save()
 
         return render_template("upload.html", name=current_user.name, panel="Upload")

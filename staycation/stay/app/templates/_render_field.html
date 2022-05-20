@@ -1,10 +1,17 @@
+<!-- macros are like functions, codes are often used and we don't want to repeat the code too often  -->
+<!-- macro applies to all fields -->
 {% macro render_field(field) %}
 
 <div class="form-group">
-    <label for="{{ field.name }} ">{{ field.label.text }}</label>
+    <label for="{{ field.name }} ">
+        <!-- all field labels have header 3 font size and the first letter is capitalized -->
+        <h3>{{ field.label.text.capitalize() }}</h3>
+    </label>
     {{ field(class_='form-control', **kwargs)|safe }}
     <ul>
+        <!-- applies to all field errors -->
         {% for error in field.errors %}
+        <!-- if there are any errors in the form, an error message will appear in red -->
         <li style="color:red;">{{ error }}</li>
         {% endfor %}
     </ul>
