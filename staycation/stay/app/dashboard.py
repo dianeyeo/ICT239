@@ -98,26 +98,27 @@ def calculate_hotelIncome():
     stay_records = Staycation.objects()
 
     for book in booking_records:
-        hotel_name = book['hotel_name']
+        # retrieve hotel name from staycation
+        hotelName = stay_records.first()['hotel_name']
         # store check_in_date in yyyy-mm-dd format
         check_in_date = book['check_in_date'].strftime('%Y-%m-%d')
         # retrieve duration from staycation
         duration = stay_records.filter(
-            hotel_name=hotel_name).first()['duration']
+            hotel_name=hotelName).first()['duration']
         # retrieve unit_cost from staycation
         unit_cost = stay_records.filter(
-            hotel_name=hotel_name).first()['unit_cost']
+            hotel_name=hotelName).first()['unit_cost']
         total_income = duration * unit_cost
 
         # if hotel name doesn't exist in hotel_totalIncome
-        if hotel_name not in hotel_totalIncome:
-            hotel_totalIncome[hotel_name] = {check_in_date: total_income}
+        if hotelName not in hotel_totalIncome:
+            hotel_totalIncome[hotelName] = {check_in_date: total_income}
         # if check_in_date exists >1 in hotel_totalIncome
-        elif check_in_date in hotel_totalIncome[hotel_name]:
-            hotel_totalIncome[hotel_name][check_in_date] += total_income
+        elif check_in_date in hotel_totalIncome[hotelName]:
+            hotel_totalIncome[hotelName][check_in_date] += total_income
         # if check_in_date doesn't exist in hotel_totalIncome
         else:
-            hotel_totalIncome[hotel_name][check_in_date] = total_income
+            hotel_totalIncome[hotelName][check_in_date] = total_income
 
     return hotel_totalIncome
 
