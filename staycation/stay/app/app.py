@@ -16,6 +16,9 @@ from dashboard import dashboard
 from auth import auth
 from book_packages import product
 from book_hotel import hotel
+from book import Bookings
+from staycation import Staycation
+from users import User
 import users
 
 # register blueprint from respective module
@@ -70,7 +73,20 @@ def upload():
                     hotel_name=item['hotel_name'], duration=item['duration'],
                     unit_cost=item['unit_cost'], image_url=item['image_url'], description=item['description']).save()
             else:
-                book = Bookings(
-                    check_in_date=item['check_in_date'], customer=item['customer'], package=item['hotel_name']).save()
+                # retrieve references before making booking
+                user_ref = User.objects(name=item['customer']).first()
+                stay_ref = Staycation.objects(
+                    hotel_name=item['hotel_name']).first()
+                # create booking
+                data = {
+                    'check_in_date': item['check_in_date'],
+                    'customer': user_ref,
+                    'package': stay_ref
+                }
+                # pass data into booking
+                book = Bookings(**data)
+                # compute total cost (retrieve function from bookings)
+                book.calculate_total_cost()
+                book.save()
 
         return render_template("upload.html", name=current_user.name, panel="Upload")

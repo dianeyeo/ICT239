@@ -15,3 +15,11 @@ def book_hotel_date():
     # get hotel name
     hotel_name = request.args.get('hotel_name')
     return render_template('book_hotel.html', name=current_user.name, panel=hotel_name, hotels=hotels)
+
+
+# submit hotel booking from book_hotel page
+# store reservation in database
+@hotel.route('/submit_booking')
+@login_required
+def submit_booking():
+    pass

@@ -8,6 +8,7 @@ import io
 
 from staycation import Staycation
 from book import Bookings
+from users import User
 
 
 dashboard = Blueprint('dashboard', __name__)
@@ -95,20 +96,14 @@ def calculate_hotelIncome():
     hotel_totalIncome = {}
 
     booking_records = Bookings.objects()
-    stay_records = Staycation.objects()
 
     for book in booking_records:
         # retrieve hotel name from staycation
-        hotelName = stay_records.first()['hotel_name']
+        hotelName = book.package.hotel_name
         # store check_in_date in yyyy-mm-dd format
         check_in_date = book['check_in_date'].strftime('%Y-%m-%d')
-        # retrieve duration from staycation
-        duration = stay_records.filter(
-            hotel_name=hotelName).first()['duration']
-        # retrieve unit_cost from staycation
-        unit_cost = stay_records.filter(
-            hotel_name=hotelName).first()['unit_cost']
-        total_income = duration * unit_cost
+        # retrieve total income from booking
+        total_income = book.total_cost
 
         # if hotel name doesn't exist in hotel_totalIncome
         if hotelName not in hotel_totalIncome:
@@ -152,11 +147,32 @@ def chartXLabels():
     return booking_dates
 
 
+def calculate_total_due(due, target):
+    bookings_due = {}
+    bookings = Bookings.objects.all()
+
+    for book in bookings:
+        if due == 'hotel':
+            if book.package.hotel_name == target:
+                if book.customer.name in bookings_due:
+                    bookings_due[book.customer.name] += 1
+                else:
+                    bookings_due[book.customer.name] = 1
+        else:
+            if book.customer.name == target:
+                if book.package.hotel_name in bookings_due:
+                    bookings_due[book.package.hotel_name] += 1
+                else:
+                    bookings_due[book.package.hotel_name] = 1
+
+    return bookings_due
+
+
 @dashboard.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def render_dashboard():
     if request.method == 'GET':
-        return render_template('dashboard.html', name=current_user.name, panel="Dashboard")
+        return render_template('trend_chart.html', name=current_user.name, panel="Dashboard")
 
     elif request.method == 'POST':
 
@@ -165,3 +181,38 @@ def render_dashboard():
         chartData = chartDim(hotelTotalIncome, chartLabels)
 
         return jsonify({'chartData': chartData, 'chartLabels': chartLabels})
+
+
+@dashboard.route('/dashboard_due_per_user', methods=['GET', 'POST'])
+def due_per_user():
+    users = User.objects().all()
+    userList = [user.name for user in users]
+    target = request.form.get('user')
+
+    if request.method == 'GET':
+        return render_template('bar_chart.html', panel='Dashboard', userList=userList)
+
+    elif request.method == 'POST':
+        pass
+
+
+@dashboard.route('/dashboard_due_per_hotel', methods=['GET', 'POST'])
+def due_per_hotel():
+    hotels = Staycation.objects.all()
+    hotelList = [hotel.hotel_name for hotel in hotels]
+
+    if request.method == 'GET':
+        return render_template('bar_chart.html', panel='Dashboard', hotelList=hotelList)
+
+    elif request.method == 'POST':
+        hotel = request.form.get('hotel_due')
+
+        for h in hotelList:
+            if hotel == h:
+                print(hotel)
+
+
+# function to post data that is selected at sidebar
+def getUserData():
+    user = request.path.get('user_due')
+    return user
