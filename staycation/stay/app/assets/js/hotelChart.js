@@ -1,64 +1,73 @@
-function myFunction(num) {
-if (num == -1)
-    return null;
-else
-    return num;
-}
+// retrieve canvas element from `trend_chart.html` to plot trend chart for hotel booking income.
+var ctx = document.getElementById('barChart').getContext('2d');
 
-var ctx = document.getElementById('pChart').getContext('2d');
 
-$.ajax({
-    url:"/due_per_hotel",
-    type:"POST",
-    data: {},
-    error: function() {
-        alert("Error");
-    },
-    success: function(data, status, xhr) {
-
-        debugger
-        
-        var chartData = {};
-        
-        var chartData = data.chartData;
-        var xLabels = data.chartLabels;
-
-        var vLabels = [];
-        var vData = [];
-
-        let newValues =[]
-
-        for (const [key, values] of Object.entries(chartData)) {
-            vLabels.push(key);
-            let newValues = values.map(myFunction);
-            debugger;
-            vData.push(newValues);
-        } 
-
-        debugger
-        var pChart = new Chart(ctx, {
+$(document).ready(function () {
+    $('#hotel_due').change(function () {
+        var hotelname = $('#hotel_due').val();
+        $.ajax({
+            url: '/dashboard_due_per_hotel',
+            type: 'POST',
             data: {
-                labels: xLabels,
-                datasets: []
+                hotel_due: hotelname
             },
-            options: {
-                responsive: true,
-                maintainaspectratio: false
+            success: function (data) {
+
+                // retrieve hotel booking income data (chart dimension) and x-axis labels (chart labels).
+                var xLabels = data.chartDim;
+                var yLabels = data.chartXLabels;
+                var due_hotel = data.user_name;
+
+                console.log(xLabels)
+                console.log(yLabels)
+
+                // clear the chart to get new data coming as we click on the select dropdown
+                let chartStatus = Chart.getChart("barChart")
+                if (chartStatus) {
+                    chartStatus.destroy()
+                }
+
+                // if dropdown is 'Select One', show empty chart
+                // only when dropdown selects a user, then plot chart
+                if (due_hotel != "Select One") {
+                    // given existing canvas element, create a trend chart for display of income data
+                    var barChart = new Chart(ctx, {
+                        type: "bar",
+                        data: {
+                            labels: xLabels,
+                            datasets: [
+                                {
+                                    label: `Booking Due Per Hotel By ${hotelname}`,
+                                    data: yLabels,
+                                    backgroundColor: "#c9a946"
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainaspectratio: false,
+                            scales: {
+                                y: {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        autoSkip: true,
+                                        padding: 10,
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    ctx.font = "20px Montserrat";
+                    ctx.textAlign = "center";
+                    ctx.fillText("Please Select an Option!", ctx.canvas.width / 2, ctx.canvas.height / 2);
+                }
             }
         });
-
-        debugger
-        for (i= 0; i < vLabels.length; i++ ) {
-            pChart.data.datasets.push({
-                label: vLabels[i],
-                type: "bar",
-                // borderColor: '#'+(0x1ff0000+Math.random()*0xffffff).toString(16).substr(1,6),
-                borderColor: '#'+(0x1100000+Math.random()*0xffffff).toString(16).substr(1,6),
-                backgroundColor: "rgba(249, 238, 236, 0.74)",
-                data: vData[i],
-                spanGaps: true
-            });
-            pChart.update();
-        }
-    }
+    });
 });

@@ -3,34 +3,33 @@ var ctx = document.getElementById('barChart').getContext('2d');
 
 
 $(document).ready(function () {
-    $('#username').change(function () {
-        var username = $('#username').val();
+    $('#user_due').change(function () {
+        var username = $('#user_due').val();
         $.ajax({
             url: '/dashboard_due_per_user',
             type: 'POST',
             data: {
-                username: username
+                user_due: username
             },
             success: function (data) {
 
                 // retrieve hotel booking income data (chart dimension) and x-axis labels (chart labels).
                 var xLabels = data.chartDim;
-                var yLabels = data.labels;
-                var due_target = data.user_name;
+                var yLabels = data.chartXLabels;
+                var due_user = data.user_name;
 
                 console.log(xLabels)
                 console.log(yLabels)
 
-                // crude way to clear the chart as we got new data coming as we click on the select dropdown
-                // TODO: consider to implement supdate instead
+                // clear the chart to get new data coming as we click on the select dropdown
                 let chartStatus = Chart.getChart("barChart")
                 if (chartStatus) {
                     chartStatus.destroy()
                 }
 
-                // if dropdown is 'Select One', empty chart
+                // if dropdown is 'Select One', show empty chart
                 // only when dropdown selects a user, then plot chart
-                if (due_target != "Select One") {
+                if (due_user != "Select One") {
                     // given existing canvas element, create a trend chart for display of income data
                     var barChart = new Chart(ctx, {
                         type: "bar",
@@ -38,7 +37,7 @@ $(document).ready(function () {
                             labels: xLabels,
                             datasets: [
                                 {
-                                    label: `Booking Due Per User By ${due_target}`,
+                                    label: `Booking Due Per User By ${username}`,
                                     data: yLabels,
                                     backgroundColor: "#c9a946"
                                 }

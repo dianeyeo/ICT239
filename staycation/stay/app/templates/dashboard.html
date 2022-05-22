@@ -47,7 +47,7 @@
                                             class="fas fa-chart-area text-light fa-lg mr-3"></i>Due Per User</a></li>
                                 <!-- get dropdown options for user choice -->
                                 {% if request.path == '/dashboard_due_per_user' %}
-                                <select class='form-select' id='user_due'>
+                                <select class='form-select' name='user_due' id='user_due' value='user_due'>
                                     <option value='Select One'>Select One</option>
                                     {% for user in userList %}
                                     <option value='{{ user }}'>{{ user }}</option>
