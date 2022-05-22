@@ -74,7 +74,7 @@ def upload():
                     unit_cost=item['unit_cost'], image_url=item['image_url'], description=item['description']).save()
             else:
                 # retrieve references before making booking
-                user_ref = User.objects(name=item['customer']).first()
+                user_ref = User.objects(email=item['customer']).first()
                 stay_ref = Staycation.objects(
                     hotel_name=item['hotel_name']).first()
                 # create booking

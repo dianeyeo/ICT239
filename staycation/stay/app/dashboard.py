@@ -149,12 +149,12 @@ def chartXLabels():
 
 def userChartLabels():
     hotels_stayed = Bookings.objects().distinct('package.hotel_name')
-    return hotels_stayed
+    user_booking = Bookings.objects().distinct('user')
 
 
 def calculate_total_due(due, target):
     bookings_due = {}
-    bookings = Bookings.objects.all()
+    bookings = Bookings.objects().all()
 
     for book in bookings:
         if due == 'hotel':
@@ -165,6 +165,7 @@ def calculate_total_due(due, target):
                     bookings_due[book.customer.name] = 1
         else:
             if book.customer.name == target:
+                print(book.customer.name)
                 if book.package.hotel_name in bookings_due:
                     bookings_due[book.package.hotel_name] += 1
                 else:
@@ -191,6 +192,7 @@ def render_dashboard():
 
 # Dashboard: Due Per User Chart
 @dashboard.route('/dashboard_due_per_user', methods=['GET', 'POST'])
+@login_required
 def due_per_user():
     users = User.objects().all()
     userList = [user.name for user in users]
@@ -203,16 +205,16 @@ def due_per_user():
 
     elif request.method == 'POST':
 
-        # user_due = calculate_total_due('user', target)
+        user_due = calculate_total_due('user', userList)
         # userChartLabel = userChartLabels()
         # chartData = chartDim(user_due, userChartLabel)
 
-        # return jsonify({'user_due': chartData, 'userChartLabel': userChartLabel})
-        return jsonify({'user_due': 'hi', 'userChartLabel': 'hi'})
+        return jsonify({'user_due': 'user_due', 'userChartLabel': 'hi'})
 
 
 # Dashboard: Due Per Hotel Chart
 @dashboard.route('/dashboard_due_per_hotel', methods=['GET', 'POST'])
+@login_required
 def due_per_hotel():
     hotels = Staycation.objects.all()
     hotelList = [hotel.hotel_name for hotel in hotels]
@@ -225,7 +227,9 @@ def due_per_hotel():
 
     elif request.method == 'POST':
 
-        return jsonify({'hotel_due': 'hi', 'userChartLabel': 'hi'})
+        hotel_due = calculate_total_due('hotel', hotelList)
+
+        return jsonify({'hotel_due': hotel_due, 'userChartLabel': 'hi'})
 
 
 # function to post data that is selected at sidebar
