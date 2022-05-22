@@ -1,22 +1,22 @@
-// retrieve canvas element from `trend_chart.html` to plot trend chart for hotel booking income.
+// retrieve container element from `trend_chart.html` to plot bar chart for hotel booking
 var ctx = document.getElementById('barChart').getContext('2d');
 
 
 $(document).ready(function () {
-    $('#user_due').change(function () {
-        var username = $('#user_due').val();
+    $('#username').change(function () {
+        var username = $('#username').val();
         $.ajax({
             url: '/dashboard_due_per_user',
             type: 'POST',
             data: {
-                user_due: username
+                username: username
             },
             success: function (data) {
 
                 // retrieve hotel booking income data (chart dimension) and x-axis labels (chart labels).
                 var xLabels = data.chartDim;
-                var yLabels = data.chartXLabels;
-                var due_user = data.user_name;
+                var yLabels = data.userChartLabel;
+                var user_due = data.user_name;
 
                 console.log(xLabels)
                 console.log(yLabels)
@@ -27,46 +27,20 @@ $(document).ready(function () {
                     chartStatus.destroy()
                 }
 
-                // if dropdown is 'Select One', show empty chart
-                // only when dropdown selects a user, then plot chart
-                if (due_user != "Select One") {
-                    // given existing canvas element, create a trend chart for display of income data
-                    var barChart = new Chart(ctx, {
-                        type: "bar",
-                        data: {
-                            labels: xLabels,
-                            datasets: [
-                                {
-                                    label: `Booking Due Per User By ${username}`,
-                                    data: yLabels,
-                                    backgroundColor: "#c9a946"
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainaspectratio: false,
-                            scales: {
-                                y: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        autoSkip: true,
-                                        padding: 10,
-                                    }
-                                }
+                // with the existing container element, create a bar chart to display income data
+                var barChart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: xLabels,
+                        datasets: [
+                            {
+                                label: `Booking Due Per User By ${user_due}`,
+                                data: yLabels,
+                                backgroundColor: "#c9a946"
                             }
-                        }
-                    });
-                }
-                else {
-                    ctx.font = "20px Montserrat";
-                    ctx.textAlign = "center";
-                    ctx.fillText("Please Select an Option!", ctx.canvas.width / 2, ctx.canvas.height / 2);
-                }
+                        ]
+                    }
+                });
             }
         });
     });

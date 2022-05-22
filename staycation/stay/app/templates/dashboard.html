@@ -47,7 +47,7 @@
                                             class="fas fa-chart-area text-light fa-lg mr-3"></i>Due Per User</a></li>
                                 <!-- get dropdown options for user choice -->
                                 {% if request.path == '/dashboard_due_per_user' %}
-                                <select class='form-select' name='user_due' id='user_due' value='user_due'>
+                                <select class='form-select' name='username' id='username' value='username'>
                                     <option value='Select One'>Select One</option>
                                     {% for user in userList %}
                                     <option value='{{ user }}'>{{ user }}</option>
@@ -154,6 +154,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
             integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
             crossorigin="anonymous"></script>
+        <!-- js for Dashbord: Total Income -->
         <script src="{{ url_for('static', filename='js/packageChart.js')}}"></script>
     </body>
 

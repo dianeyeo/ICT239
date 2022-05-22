@@ -147,9 +147,16 @@ def chartXLabels():
     return booking_dates
 
 
-def userChartLabels():
+def chartLabels(chart):
     hotels_stayed = Bookings.objects().distinct('package.hotel_name')
     user_booking = Bookings.objects().distinct('user')
+    user_booking = [i.username for i in user_booking]
+
+    if chart == 'hotel':
+        return user_booking
+    else:
+        # print(hotels_stayed)
+        return hotels_stayed
 
 
 def calculate_total_due(due, target):
@@ -165,7 +172,7 @@ def calculate_total_due(due, target):
                     bookings_due[book.customer.name] = 1
         else:
             if book.customer.name == target:
-                print(book.customer.name)
+                # print(book.customer.name)
                 if book.package.hotel_name in bookings_due:
                     bookings_due[book.package.hotel_name] += 1
                 else:
@@ -196,20 +203,22 @@ def render_dashboard():
 def due_per_user():
     users = User.objects().all()
     userList = [user.name for user in users]
-    target = request.form.get('user_due')
+    target = request.form.get('username')
     # check
-    print(target)
+    # print(target)
 
     if request.method == 'GET':
         return render_template('bar_chart.html', panel='Dashboard', userList=userList)
 
     elif request.method == 'POST':
 
-        user_due = calculate_total_due('user', userList)
-        # userChartLabel = userChartLabels()
-        # chartData = chartDim(user_due, userChartLabel)
+        user_bookings = calculate_total_due('username', target)
+        # check
+        # print(user_bookings)
+        chartDim = list(user_bookings.keys())
+        chartLabels = list(user_bookings.values())
 
-        return jsonify({'user_due': 'user_due', 'userChartLabel': 'hi'})
+        return jsonify({'chartDim': chartDim, 'userChartLabel': chartLabels, 'user_name': target})
 
 
 # Dashboard: Due Per Hotel Chart
@@ -220,19 +229,17 @@ def due_per_hotel():
     hotelList = [hotel.hotel_name for hotel in hotels]
     target = request.form.get('hotel_due')
     # check
-    print(target)
+    # print(target)
 
     if request.method == 'GET':
         return render_template('bar_chart.html', panel='Dashboard', hotelList=hotelList)
 
     elif request.method == 'POST':
 
-        hotel_due = calculate_total_due('hotel', hotelList)
+        hotel_booked_by = calculate_total_due('hotel', target)
+        # check
+        # print(hotel_booked_by)
+        chartDim = list(hotel_booked_by.keys())
+        chartLabels = list(hotel_booked_by.values())
 
-        return jsonify({'hotel_due': hotel_due, 'userChartLabel': 'hi'})
-
-
-# function to post data that is selected at sidebar
-def getUserData():
-    user = request.path.get('user_due')
-    return user
+        return jsonify({'chartDim': chartDim, 'hotelChartLabel': chartLabels, 'user_name': target})
