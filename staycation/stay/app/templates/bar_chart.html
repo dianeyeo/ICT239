@@ -4,11 +4,15 @@
 
 
 <div class="card-header">
-    <h3>{{ panel }}</h3>
+    {% if request.path == '/dashboard_due_per_user' %}
+    <h3>Due Per User</h3>
+    {% else %}
+    <h3>Due Per Hotel</h3>
+    {% endif %}
 </div>
 <div class="card-body">
     <div class="chart-container" style="position: relative; width:100%; height:80vh;">
-        <canvas id="bar_chart" width="400" height="400"></canvas>
+        <canvas id="barChart" width="400" height="400"></canvas>
     </div>
 </div>
 

@@ -1,5 +1,5 @@
 // retrieve canvas element from `trend_chart.html` to plot trend chart for hotel booking income.
-var ctx = document.getElementById('bar_chart').getContext('2d');
+var ctx = document.getElementById('barChart').getContext('2d');
 
 
 $(document).ready(function () {
@@ -18,16 +18,18 @@ $(document).ready(function () {
                 var yLabels = data.labels;
                 var due_target = data.user_name;
 
-                console.log(yLabels)
                 console.log(xLabels)
+                console.log(yLabels)
 
                 // crude way to clear the chart as we got new data coming as we click on the select dropdown
                 // TODO: consider to implement supdate instead
-                let chartStatus = Chart.getChart("bar_chart")
+                let chartStatus = Chart.getChart("barChart")
                 if (chartStatus) {
                     chartStatus.destroy()
                 }
 
+                // if dropdown is 'Select One', empty chart
+                // only when dropdown selects a user, then plot chart
                 if (due_target != "Select One") {
                     // given existing canvas element, create a trend chart for display of income data
                     var barChart = new Chart(ctx, {
