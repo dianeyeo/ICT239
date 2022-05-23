@@ -15,6 +15,14 @@ A full description of this project is available as a Medium article
 
 -   . venv/bin/activate
 
+(if have start.sh file)
+
+3. run start.sh file
+
+-   . start.sh
+
+(if no start.sh file) 
+
 3. install requirements.txt for dependencies
 
 -   pip install -r requirements.txt
